@@ -1,18 +1,15 @@
 <script lang="ts">
-  import TailwindCss from './TailwindCSS.svelte';
-  import Header from './components/Header.svelte';
+  import Router from 'svelte-spa-router';
 
-  export let name: string;
+  import TailwindCss from './TailwindCSS.svelte';
+  import { routes } from './router';
+  import Header from './components/Header.svelte';
 </script>
 
 <TailwindCss />
 <Header />
 <main class="pt-16">
   <div class="container mx-auto px-6 my-4">
-    <h1>Hello {name}!</h1>
-    <p>
-      Visit the <a href="https://svelte.dev/tutorial">Svelte tutorial</a> to learn how to build Svelte
-      apps.
-    </p>
+    <Router {routes} />
   </div>
 </main>
