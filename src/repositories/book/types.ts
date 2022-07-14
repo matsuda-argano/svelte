@@ -2,7 +2,7 @@
  * Google Books APIのレスポンス
  */
 export interface Result {
-  imtes: BookItem[];
+  items: BookItem[];
   kind: string;
   totalItems: number;
 }
