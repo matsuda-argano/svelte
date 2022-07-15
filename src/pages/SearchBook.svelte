@@ -32,13 +32,13 @@
   };
 
   const getBooks = async () => {
-    $books = [];
+    books.reset();
     empty = false;
     startIndex = 0;
     const result = await BookRepository.get({ q });
     empty = result.totalItems === 0;
     totalItems = result.totalItems;
-    $books = result.items;
+    books.add(result.items);
   };
 
   const handlerLoadMore = () => {
@@ -53,7 +53,7 @@
     const bookIds = $books.map((book) => book.id);
     const filteredItems = result.items.filter((item) => !bookIds.includes(item.id));
 
-    $books = [...$books, ...filteredItems];
+    books.add(filteredItems);
   };
 </script>
 
