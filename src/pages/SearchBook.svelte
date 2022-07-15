@@ -1,8 +1,10 @@
 <script lang="ts">
+  import InfiniteScroll from 'svelte-infinite-scroll';
+
   import SearchBar from '../components/SearchBar.svelte';
   import BookCard from '../components/BookCard.svelte';
   import Spinner from '../components/Spinner.svelte';
-  import type { BookItem, Result } from '../repositories/book';
+  import type { BookItem } from '../repositories/book';
   import RepositoryFactory, { BOOK } from '../repositories/RepositoryFactory';
 
   const BookRepository = RepositoryFactory[BOOK];
@@ -11,6 +13,10 @@
   let empty = false;
   let books: BookItem[] = [];
   let promise: Promise<void>;
+  let startIndex = 0;
+  let totalItems = 0;
+
+  $: hasMore = totalItems > books.length;
 
   const handleSubmit = () => {
     if (!q.trim()) return;
@@ -20,9 +26,26 @@
   const getBooks = async () => {
     books = [];
     empty = false;
+    startIndex = 0;
     const result = await BookRepository.get({ q });
     empty = result.totalItems === 0;
+    totalItems = result.totalItems;
     books = result.items;
+  };
+
+  const handlerLoadMore = () => {
+    startIndex += 10;
+    promise = getNextPage();
+  };
+
+  const getNextPage = async () => {
+    const result = await BookRepository.get({ q, startIndex });
+
+    // 取得データが既に存在する可能性もあるため、idでフィルタリング
+    const bookIds = books.map((book) => book.id);
+    const filteredItems = result.items.filter((item) => !bookIds.includes(item.id));
+
+    books = [...books, ...filteredItems];
   };
 </script>
 
@@ -40,6 +63,8 @@
       {/each}
     </div>
   {/if}
+
+  <InfiniteScroll window threshold={100} on:loadMore={handlerLoadMore} {hasMore} />
 
   {#await promise}
     <div class="flex justify-center">
